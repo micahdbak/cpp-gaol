@@ -22,21 +22,20 @@ void callback(void *_state, double delta) {
 
 	state.box->x = (int)state.x;
 	state.box->y = (int)state.y;
-
-	//std::cout << "Time since last frame: " << delta << std::endl;
 }
 
 int main() {
 	// create SDL2 window
-	GAOL::GAOL gaol("Example 1", 32, 32, 512, 512, BLACK);
+	GAOL::GAOL gaol("Example 1", 32, 32, 512, 512);
+	gaol.bgcol = ORANGE;
 
 	// prepare application state
 	State state;
 
 	state.x = state.y = 64.0;
 	state.box = new GAOL::Object;
-	state.box->add_graphic(new GAOL::Circle(0, 0, RED, 16));
-	state.box->add_graphic(new GAOL::Text(-16, 16, "Hello, world!"));
+	state.box->add_graphic(new GAOL::Circle(0, 0, PURPLE, 16));
+	state.box->add_graphic(new GAOL::Text(-16, 16, BLACK, "Hello, world!"));
 
 	gaol.push(state.box); // let gaol know about this object
 

@@ -3,18 +3,21 @@
 
 #include <cstdint> // for uint32_t (Color)
 
-#define BLACK   0x000000ff
-#define RED     0xff0000ff
-#define YELLOW  0xffff00ff
-#define GREEN   0x00ff00ff
-#define TEAL    0x00ffffff
-#define BLUE    0x0000ffff
-#define PURPLE  0xff00ffff
-#define GRAY    0x808080ff
-#define WHITE   0xffffffff
+#define BLACK   GAOL::RGBA(0,0,0,255)
+#define RED     GAOL::RGBA(255,0,0,255)
+#define ORANGE  GAOL::RGBA(255,128,0,255)
+#define YELLOW  GAOL::RGBA(255,255,0,255)
+#define GREEN   GAOL::RGBA(0,255,0,255)
+#define TEAL    GAOL::RGBA(0,255,255,255)
+#define BLUE    GAOL::RGBA(0,0,255,255)
+#define PURPLE  GAOL::RGBA(255,0,255,255)
+#define GRAY    GAOL::RGBA(128,128,128,255)
+#define WHITE   GAOL::RGBA(255,255,255,255)
 
 namespace GAOL {
 	typedef uint32_t Color; // Color
+
+	Color RGBA(uint32_t r, uint32_t g, uint32_t b, uint32_t a);
 
 	class Graphic {
 	public:
@@ -43,12 +46,13 @@ namespace GAOL {
 	class Text: public Graphic {
 	public:
 		Text() {}
-		Text(int _sx, int _sy, std::string _text):
-			sx(_sx), sy(_sy), text(_text) {}
+		Text(int _sx, int _sy, Color _color, std::string _text):
+			sx(_sx), sy(_sy), color(_color), text(_text) {}
 
 		~Text() {}
 
 		int sx, sy; // shift x, shift y
+		Color color;
 		std::string text;
 
 		virtual void render(int x, int y) const;
@@ -86,8 +90,10 @@ namespace GAOL {
 		// y: y-position of window
 		// w: width of window
 		// h: height of window
-		GAOL(std::string title, int x, int y, int w, int h, Color _bgcol);
+		GAOL(std::string title, int x, int y, int w, int h);
 		~GAOL();
+
+		Color bgcol; // background color
 
 		// push an object into the system
 		void push(Object *o) { objects.push_back(o); };
@@ -99,7 +105,6 @@ namespace GAOL {
 		 * state: data structure to be modified by calling callback */
 		void respond(void (*callback)(void *state, double delta), void *state);
 	private:
-		Color bgcol; // background color
 		std::vector<Object*> objects;
 	}; // class GAOL
 }; // namespace GAOL
