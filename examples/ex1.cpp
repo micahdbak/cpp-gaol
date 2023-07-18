@@ -3,5 +3,8 @@
 #include "gaol.hpp"
 
 int main() {
-	gaol::hello();
+	GAOL::GAOL gaol("Example 1");
+
+	gaol.respond(); // respond to user interaction
+	// gaol cleans up as it is destroyed
 }
