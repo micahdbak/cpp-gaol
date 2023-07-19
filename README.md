@@ -29,3 +29,7 @@ the name of the example file as found in the `examples` directory (excluding the
 ```
 make %.out
 ```
+
+`ex1.cpp` provides a particle simulator, with one nucleus (3 protons, 4 neutrons), and 3 electrons *attempting* to orbit.
+
+![Example 1](ex1.png?raw=true "Example 1")

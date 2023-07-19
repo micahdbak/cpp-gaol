@@ -1,23 +1,82 @@
 #ifndef GAOL_HPP
 #define GAOL_HPP
 
-#include <cstdint> // for uint32_t (Color)
-
-#define BLACK   GAOL::RGBA(0,0,0,255)
-#define RED     GAOL::RGBA(255,0,0,255)
-#define ORANGE  GAOL::RGBA(255,128,0,255)
-#define YELLOW  GAOL::RGBA(255,255,0,255)
-#define GREEN   GAOL::RGBA(0,255,0,255)
-#define TEAL    GAOL::RGBA(0,255,255,255)
-#define BLUE    GAOL::RGBA(0,0,255,255)
-#define PURPLE  GAOL::RGBA(255,0,255,255)
-#define GRAY    GAOL::RGBA(128,128,128,255)
-#define WHITE   GAOL::RGBA(255,255,255,255)
+#define BLACK   GAOL::Color(0,0,0,255)
+#define RED     GAOL::Color(255,0,0,255)
+#define PINK    GAOL::Color(255,128,128,255)
+#define ORANGE  GAOL::Color(255,128,0,255)
+#define YELLOW  GAOL::Color(255,255,0,255)
+#define GREEN   GAOL::Color(0,255,0,255)
+#define TEAL    GAOL::Color(0,255,255,255)
+#define BLUE    GAOL::Color(0,0,255,255)
+#define PURPLE  GAOL::Color(255,0,255,255)
+#define MAGENTA GAOL::Color(255,128,255,255)
+#define GRAY    GAOL::Color(128,128,128,255)
+#define WHITE   GAOL::Color(255,255,255,255)
 
 namespace GAOL {
-	typedef uint32_t Color; // Color
+	class Color {
+	public:
+		Color(): r(0), g(0), b(0), a(0) {}
+		Color(uint8_t _r, uint8_t _g, uint8_t _b, uint8_t _a):
+			r(_r), g(_g), b(_b), a(_a) {}
 
-	Color RGBA(uint32_t r, uint32_t g, uint32_t b, uint32_t a);
+		int r, g, b, a;
+
+		Color operator+(int amnt) const {
+			Color c(*this);
+
+			c.r += amnt;
+			c.r = c.r > 255 ? 255 : c.r;
+			c.g += amnt;
+			c.g = c.g > 255 ? 255 : c.g;
+			c.b += amnt;
+			c.b = c.b > 255 ? 255 : c.b;
+
+			return c;
+		}
+
+		Color operator-(int amnt) const {
+			Color c(*this);
+
+			c.r -= amnt;
+			c.r = c.r < 0 ? 0 : c.r;
+			c.g -= amnt;
+			c.g = c.g < 0 ? 0 : c.g;
+			c.b -= amnt;
+			c.b = c.b < 0 ? 0 : c.b;
+
+			return c;
+		}
+	}; // Color
+
+	class vec {
+	public:
+		vec(): x(0.0), y(0.0) {}
+		vec(double _x, double _y): x(_x), y(_y) {}
+		~vec() {}
+
+		double x, y;
+
+		void set(double _x, double _y);
+		void set_ang(double ang, double mag);
+		double mag() const;
+		double ang() const;
+
+		vec operator=(vec other);
+		vec operator+(vec other) const;
+		vec operator+=(vec other);
+		vec operator-(vec other) const;
+		vec operator-=(vec other);
+		vec operator*(vec other) const;
+		vec operator*=(vec other);
+		vec operator*(double scalar) const;
+		vec operator*=(double scalar);
+		vec operator/(vec other) const;
+		vec operator/=(vec other);
+		vec operator/(double scalar) const;
+		vec operator/=(double scalar);
+	}; // class vec
 
 	class Graphic {
 	public:
@@ -36,7 +95,7 @@ namespace GAOL {
 
 		~Circle() {}
 
-		int sx, sy; // shift x, shift y
+		int sx, sy;
 		Color color;
 		int radius;
 
@@ -51,12 +110,27 @@ namespace GAOL {
 
 		~Text() {}
 
-		int sx, sy; // shift x, shift y
+		int sx, sy;
 		Color color;
 		std::string text;
 
 		virtual void render(int x, int y) const;
 	}; // class Text
+
+	class Arrow: public Graphic {
+	public:
+		Arrow() {}
+		Arrow(int _sx, int _sy, Color _color, double _ang, double _mag):
+			sx(_sx), sy(_sy), color(_color), ang(_ang), mag(_mag) {}
+
+		~Arrow() {}
+
+		int sx, sy;
+		Color color;
+		double ang, mag;
+
+		virtual void render(int x, int y) const;
+	}; // class Arrow
 
 	// Object: represent an object to be displayed on the screen
 	class Object {
@@ -68,6 +142,11 @@ namespace GAOL {
 
 		int x, y;
 
+		void move(vec &v) {
+			x = (int)v.x;
+			y = (int)v.y;
+		}
+
 		void add_graphic(Graphic *graphic) {
 			gfx.push_back(graphic);
 		}
@@ -76,6 +155,10 @@ namespace GAOL {
 			// for every graphic
 			for (size_t i = 0; i < gfx.size(); i++)
 				gfx[i]->render(x, y); // render graphic
+		}
+
+		Graphic *graphic(int i) {
+			return gfx[i];
 		}
 	private:
 		std::vector<Graphic *> gfx;
@@ -98,12 +181,14 @@ namespace GAOL {
 		// push an object into the system
 		void push(Object *o) { objects.push_back(o); };
 
+		// add a pixel onto the screen with the specified coordinates and color
+		void pixel(int x, int y, Color color);
+
 		/* respond: respond to user interaction with window; update
 		 * callback: function pointer that will be called every frame;
-		 * 	assumed to update data structure pointed to by state
-		 * 	with respect to change in time since last frame (delta)
-		 * state: data structure to be modified by calling callback */
-		void respond(void (*callback)(void *state, double delta), void *state);
+		 * 	assumed to update an external data structure
+		 * 	with respect to change in time since last frame (delta) */
+		void respond(void (*callback)(GAOL *gaol, double delta));
 	private:
 		std::vector<Object*> objects;
 	}; // class GAOL

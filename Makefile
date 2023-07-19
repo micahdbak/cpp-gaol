@@ -9,8 +9,8 @@ objs/%.o: gaol/%.cpp
 objs:
 	mkdir -p objs
 
-gaol.a: objs objs/gaol.o
-	ar -r gaol.a objs/gaol.o
+gaol.a: objs objs/gaol.o objs/vec.o
+	ar -r gaol.a objs/gaol.o objs/vec.o
 
 %.out: examples/%.cpp gaol.a
 	c++ $(CPPFLAGS) $(SDL2_LINK) -Igaol gaol.a $< -o $@
